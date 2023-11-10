@@ -1,0 +1,221 @@
+<aside class="config-panel position-fixed">
+    <div id="user-intro">
+        <img id="user-photo" src="<?= $i['src']?>">
+        <h3 id="user-name"></h3>
+        <iconify-icon icon="fa-solid:cog" class="intro-icon"></iconify-icon>
+    </div>
+    <div id="all-convs">
+    </div>
+    
+</aside>
+
+<section class="messages">
+    <div id="conv-header" class="position-fixed">
+        <h3 id="conv-title"></h3>
+    </div>
+    <div id="conv-content"></div> 
+
+    <div id="conv-form">
+        <textarea class="form-control" id="message" name="message"></textarea>
+        <button class="btn btn-success" id="sendBtn">Envoyer</button>
+    </div>
+</section>
+
+<script>
+    
+    // Display conversation
+
+        // DOM var
+        let convTitle = document.querySelector('#conv-title');
+        let convBlock = document.querySelector('#conv-content');
+        let messageInput = document.querySelector('#message');
+        let sendBtn = document.querySelector('#sendBtn');
+        let userId = <?= $_SESSION['user_info']['id'] ?>;
+        const months = ['jan','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+        let conversation = [];
+        async function displayConv() {
+            
+            // Récupérer les data
+            await fetch('?page=getconv&conv=<?= $_GET['conv'] ?>')
+            .then(response => response.json())
+            .then(data => conversation = data)
+            .catch(error => console.error("Error :", error));
+            
+            // Construire le titre de la conversation
+            if(convTitle.textContent.length == 0) {
+                let friends = ``;
+                for(user of conversation.users) {
+                    if(user.id != userId) {
+                        friends += friends.length == 0 ? '':', ';
+                        friends += `${user.first_name} ${user.last_name}`;
+                    }
+                }
+                convTitle.textContent = `${friends}`; 
+            }        
+            
+            // Construire la page
+            while (conversation.messages.length > convBlock.children.length) {
+                // Create card
+                const cardGroup = document.createElement('div');
+                convBlock.appendChild(cardGroup);
+                let currentMessage = conversation.messages[convBlock.children.length-1];
+                cardGroup.classList.add('card-group','mb-2', `align-self-${userId == currentMessage.id_sender ? 'end':'start'}`);
+                
+                // Préparer le nom de l'utilisateur qui écrit le message
+                let name = ``;
+                for(user of conversation.users) {
+                    if(currentMessage.id_sender == user.id) {
+                        name = user.first_name;
+                    }
+                }
+                // Create user name
+                const cardName = document.createElement('p');
+                cardName.classList.add('card-name');
+                cardName.textContent = `${userId == currentMessage.id_sender ? "":name}`;
+                cardGroup.appendChild(cardName)
+                
+                // Create card body
+                const cardBody = document.createElement('div');
+                cardBody.classList.add('card',`border-${userId == currentMessage.id_sender ? 'primary':'secondary'}`);
+                cardGroup.appendChild(cardBody);
+                
+                // Create card content
+                const cardContent = document.createElement('p');
+                cardContent.classList.add('card-text');
+                cardContent.textContent = currentMessage.message;
+                cardBody.appendChild(cardContent);
+                
+                // Préparer la date
+                let date = new Date(currentMessage.date_sent);
+                date = `le ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()} à ${date.getHours() < 10 ? "0":""}${date.getHours()}:${date.getMinutes() < 10 ? "0":""}${date.getMinutes()}`;
+                const cardDate = document.createElement('p');
+                cardDate.classList.add('card-datetime', `align-self-${userId == currentMessage.id_sender ? 'end':'start'}`);
+                cardDate.textContent = date;
+                cardGroup.appendChild(cardDate);
+                
+                // go to end of page
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        };
+        setInterval(displayConv, 500);
+
+    // End Display conv
+ 
+    // Post message
+        async function postMessage(e) {
+            e.preventDefault();
+            if(messageInput.value.trim() != "") {
+                let message = {
+                    'id_sender': `${userId}`,
+                    'id_conv': `<?= $_GET['conv'] ?>`,
+                    'message': messageInput.value
+                }          
+                
+                await fetch('?page=sendmessage', {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(message),
+                })
+                .catch(error => console.error("Error :", error));
+                
+                messageInput.value = "";
+            }
+        }
+        let shift = false;
+        messageInput.addEventListener('keydown', (e) => {
+            if(e.key == "Shift") {
+                shift = true;
+            }
+            if(e.key == "Enter" && shift) {
+                shift = false;
+            }
+            else if(e.key == "Enter") {
+                e.preventDefault();
+                postMessage(e);
+            }
+            else if(e.key != "Shift") {
+                shift = false;
+            }
+        })
+        sendBtn.addEventListener('click', postMessage);
+    // End post message
+    
+    // Display user header
+        // DOM
+        const userIntro = document.querySelector('#user-intro');
+        const userName = document.querySelector('#user-name');
+
+        userName.textContent = "<?= $_SESSION['user_info']['first_name'].' '.$_SESSION['user_info']['last_name'] ?>"
+    // End display user header
+
+    // Display all convs
+        let allConvs = [];
+        const convPanel = document.querySelector('#all-convs');
+        async function getAllConvs() {
+            // Récupérer les data
+            await fetch('?page=getallconvs')
+            .then(response => response.json())
+            .then(data => allConvs = data)
+            .catch(error => console.error("Error :", error));
+
+            while(allConvs.length > convPanel.children.length) {
+                curConv = convPanel.children.length;
+                // Créer le bloc
+                const convBlock = document.createElement('div');
+                convBlock.classList.add('conv-block');
+                // convBlock.setAttribute('data-conv-id', allConvs[0])
+                convPanel.appendChild(convBlock);
+
+                // Bloc de gauche
+                const mainSection = document.createElement('div');
+                convBlock.appendChild(mainSection);
+                mainSection.classList.add('conv-main');
+
+                // Ajouter l'image de la conv
+                const convImg = document.createElement('img');
+                convImg.classList.add('conv-img');
+                convImg.src = allConvs[curConv][3].src;
+                mainSection.appendChild(convImg);
+
+                // Ajout div texte
+                const convInfos = document.createElement('div');
+                mainSection.appendChild(convInfos);
+                convInfos.classList.add('.conv-infos');
+
+                // Ajouter les participants à la conv
+                const convUsers = document.createElement('p');
+                let friends = ``;
+                for(user of allConvs[curConv][1]) {
+                    if(user.id != userId) {
+                        friends += friends.length == 0 ? '':', ';
+                        friends += `${user.first_name} ${user.last_name}`;
+                    }
+                }
+                convUsers.textContent = `${friends.length > 50 ? friends.substring(0,50)+'...':friends}`;
+                convUsers.classList.add('conv-users');
+                convInfos.appendChild(convUsers);
+
+                // Ajouter le dernier message envoyé à la conv
+                const convMessage = document.createElement('p');
+                convMessage.textContent = `${allConvs[curConv][2].message.length > 50 ? allConvs[curConv][2].message.substring(0,50)+"...":allConvs[curConv][2].message}`;
+                convMessage.classList.add('conv-message');
+                convInfos.appendChild(convMessage);
+
+                // Ajouter l'heure du dernier message
+                const convTime = document.createElement('p');
+                date = allConvs[curConv][2].date_sent.split(' ');
+                date = date[1].split(':');
+                date = `${date[0]}:${date[1]}`;
+                convTime.textContent = date;
+                convBlock.appendChild(convTime);
+            }
+
+        }
+        setInterval(getAllConvs, 1000);
+    // End display all convs
+    
+
+</script>
