@@ -30,4 +30,15 @@ class Conversation {
         WHERE id_user = ? AND id_conv = ?");
         $sql->execute([date('Y-m-d H:i:s'),$id_user,$id_conv]);
     }
+
+    public static function getLastSeen($id_user) {
+        $curConv = 0;
+
+        $pdo = connectDB();
+        $statement = $pdo->prepare("SELECT id_conv FROM conversations_users WHERE id_user=? ORDER BY last_seen DESC LIMIT 1");
+        $statement->execute([$id_user]);
+        $curConv = $statement->fetchColumn();
+
+        return $curConv;
+    }
 }

@@ -42,7 +42,8 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding-top: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--lines);
 }
 
 #user-name {
@@ -60,17 +61,15 @@ body {
     color: var(--primary);
 }
 
-#all-convs {
-    padding: 30px 0;
-}
 
 .conv-block {
     border-bottom: 1px solid var(--lines);
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 16px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    cursor:pointer;
 }
 
 .conv-main {

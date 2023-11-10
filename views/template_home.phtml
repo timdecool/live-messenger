@@ -24,6 +24,16 @@
 <script>
     
     // Display conversation
+        let curConv = 0;
+
+        // Get last conv
+        (async function getLastConv() {
+            // Récupérer les data
+            await fetch('?page=curconv')
+            .then(response => response.json())
+            .then(data => curConv = data)
+            .catch(error => console.error("Error :", error));
+        })();
 
         // DOM var
         let convTitle = document.querySelector('#conv-title');
@@ -33,10 +43,10 @@
         let userId = <?= $_SESSION['user_info']['id'] ?>;
         const months = ['jan','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
         let conversation = [];
+
         async function displayConv() {
-            
             // Récupérer les data
-            await fetch('?page=getconv&conv=<?= $_GET['conv'] ?>')
+            await fetch(`?page=getconv&conv=${curConv}`)
             .then(response => response.json())
             .then(data => conversation = data)
             .catch(error => console.error("Error :", error));
@@ -166,8 +176,9 @@
                 // Créer le bloc
                 const convBlock = document.createElement('div');
                 convBlock.classList.add('conv-block');
-                // convBlock.setAttribute('data-conv-id', allConvs[0])
+                convBlock.setAttribute('data-conv-id', allConvs[curConv][0])
                 convPanel.appendChild(convBlock);
+                convBlock.addEventListener('click', changeConv);
 
                 // Bloc de gauche
                 const mainSection = document.createElement('div');
@@ -194,13 +205,13 @@
                         friends += `${user.first_name} ${user.last_name}`;
                     }
                 }
-                convUsers.textContent = `${friends.length > 50 ? friends.substring(0,50)+'...':friends}`;
+                convUsers.textContent = `${friends.length > 50 ? friends.substring(0,30)+'...':friends}`;
                 convUsers.classList.add('conv-users');
                 convInfos.appendChild(convUsers);
 
                 // Ajouter le dernier message envoyé à la conv
                 const convMessage = document.createElement('p');
-                convMessage.textContent = `${allConvs[curConv][2].message.length > 50 ? allConvs[curConv][2].message.substring(0,50)+"...":allConvs[curConv][2].message}`;
+                convMessage.textContent = `${allConvs[curConv][2].message.length > 50 ? allConvs[curConv][2].message.substring(0,30)+"...":allConvs[curConv][2].message}`;
                 convMessage.classList.add('conv-message');
                 convInfos.appendChild(convMessage);
 
@@ -213,9 +224,17 @@
                 convBlock.appendChild(convTime);
             }
 
-        }
-        setInterval(getAllConvs, 1000);
+        };
+        getAllConvs();
+        setInterval(getAllConvs, 5000);
+
     // End display all convs
+
+    async function changeConv(e) {
+        curConv = e.currentTarget.dataset.convId;
+        
+        console.log(curConv);
+    }
     
 
 </script>
