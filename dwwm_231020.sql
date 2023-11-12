@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 4.9.5
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3306
--- Généré le : ven. 10 nov. 2023 à 16:04
--- Version du serveur : 10.4.10-MariaDB
--- Version de PHP : 8.2.11
+-- Host: localhost:3306
+-- Generation Time: Nov 12, 2023 at 07:47 PM
+-- Server version: 5.7.24
+-- PHP Version: 7.4.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -18,29 +19,26 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `dwwm_231020`
+-- Database: `dwwm_231020`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `comments`
+-- Table structure for table `comments`
 --
 
-DROP TABLE IF EXISTS `comments`;
-CREATE TABLE IF NOT EXISTS `comments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL,
   `id_image` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
   `comment` text NOT NULL,
-  `date_posted` datetime NOT NULL DEFAULT current_timestamp(),
-  `date_edited` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `fk_commentsidimage_imagesid` (`id_image`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+  `date_posted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_edited` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `comments`
+-- Dumping data for table `comments`
 --
 
 INSERT INTO `comments` (`id`, `id_image`, `id_user`, `comment`, `date_posted`, `date_edited`) VALUES
@@ -49,79 +47,74 @@ INSERT INTO `comments` (`id`, `id_image`, `id_user`, `comment`, `date_posted`, `
 (20, 16, 30, 'J\'aime bien la forêt !', '2023-11-03 09:45:17', '2023-11-03 09:45:17'),
 (21, 21, 30, 'ça fait réfléchir...', '2023-11-03 10:55:12', '2023-11-03 10:55:12'),
 (23, 18, 31, 'C\'est l\'automne... snif', '2023-11-03 11:37:02', '2023-11-03 11:37:02'),
-(24, 18, 34, 'Magnifique ! J\'ai les mêmes dans mon jardin :)', '2023-11-03 11:58:04', '2023-11-03 11:58:04');
+(24, 18, 34, 'Magnifique ! J\'ai les mêmes dans mon jardin :)', '2023-11-03 11:58:04', '2023-11-03 11:58:04'),
+(27, 23, 30, 'Il est beau ce cerf !!', '2023-11-11 12:20:01', '2023-11-11 12:20:01');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `conversations`
+-- Table structure for table `conversations`
 --
 
-DROP TABLE IF EXISTS `conversations`;
-CREATE TABLE IF NOT EXISTS `conversations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `conversations` (
+  `id` int(11) NOT NULL,
   `id_creator` int(11) NOT NULL,
-  `date_created` datetime NOT NULL DEFAULT current_timestamp(),
-  `date_updated` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `conversations`
+-- Dumping data for table `conversations`
 --
 
 INSERT INTO `conversations` (`id`, `id_creator`, `date_created`, `date_updated`) VALUES
-(1, 30, '2023-11-09 11:16:21', '2023-11-09 11:16:21'),
-(2, 30, '2023-11-09 14:20:47', '2023-11-09 14:20:47');
+(1, 30, '2023-11-09 11:16:21', '2023-11-12 18:48:49'),
+(2, 30, '2023-11-09 14:20:47', '2023-11-12 19:14:20');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `conversations_users`
+-- Table structure for table `conversations_users`
 --
 
-DROP TABLE IF EXISTS `conversations_users`;
-CREATE TABLE IF NOT EXISTS `conversations_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `conversations_users` (
+  `id` int(11) NOT NULL,
   `id_conv` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
-  `last_seen` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `last_seen` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `conversations_users`
+-- Dumping data for table `conversations_users`
 --
 
 INSERT INTO `conversations_users` (`id`, `id_conv`, `id_user`, `last_seen`) VALUES
-(1, 1, 30, '2023-11-10 09:36:41'),
+(1, 1, 30, '2023-11-12 20:46:49'),
 (2, 1, 37, '2023-11-09 15:06:31'),
-(3, 2, 30, '2023-11-10 09:36:39'),
+(3, 2, 30, '2023-11-12 19:34:30'),
 (4, 2, 37, '2023-11-09 15:06:25'),
-(5, 2, 31, '2023-11-09 14:55:48');
+(5, 2, 31, '2023-11-12 20:47:05');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `images`
+-- Table structure for table `images`
 --
 
-DROP TABLE IF EXISTS `images`;
-CREATE TABLE IF NOT EXISTS `images` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `images` (
+  `id` int(11) NOT NULL,
   `src` varchar(255) NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` varchar(150) DEFAULT NULL,
   `author` varchar(60) NOT NULL DEFAULT 'Unknown',
   `author_link` varchar(200) DEFAULT NULL,
-  `date_added` datetime NOT NULL DEFAULT current_timestamp(),
-  `date_updated` datetime NOT NULL DEFAULT current_timestamp(),
-  `id_user` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_user` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `images`
+-- Dumping data for table `images`
 --
 
 INSERT INTO `images` (`id`, `src`, `title`, `description`, `author`, `author_link`, `date_added`, `date_updated`, `id_user`) VALUES
@@ -148,19 +141,17 @@ INSERT INTO `images` (`id`, `src`, `title`, `description`, `author`, `author_lin
 -- --------------------------------------------------------
 
 --
--- Structure de la table `likes`
+-- Table structure for table `likes`
 --
 
-DROP TABLE IF EXISTS `likes`;
-CREATE TABLE IF NOT EXISTS `likes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `likes` (
+  `id` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
-  `id_image` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
+  `id_image` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `likes`
+-- Dumping data for table `likes`
 --
 
 INSERT INTO `likes` (`id`, `id_user`, `id_image`) VALUES
@@ -175,26 +166,25 @@ INSERT INTO `likes` (`id`, `id_user`, `id_image`) VALUES
 (41, 36, 23),
 (42, 30, 21),
 (43, 30, 25),
-(44, 30, 24);
+(44, 30, 24),
+(45, 30, 23);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `messages`
+-- Table structure for table `messages`
 --
 
-DROP TABLE IF EXISTS `messages`;
-CREATE TABLE IF NOT EXISTS `messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL,
   `id_conv` int(11) NOT NULL,
   `id_sender` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `date_sent` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=51 DEFAULT CHARSET=latin1;
+  `message` text,
+  `date_sent` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `messages`
+-- Dumping data for table `messages`
 --
 
 INSERT INTO `messages` (`id`, `id_conv`, `id_sender`, `message`, `date_sent`) VALUES
@@ -237,31 +227,46 @@ INSERT INTO `messages` (`id`, `id_conv`, `id_sender`, `message`, `date_sent`) VA
 (47, 1, 30, 'heyyy', '2023-11-10 15:24:09'),
 (48, 1, 30, 'yoooo', '2023-11-10 15:35:08'),
 (49, 1, 30, 'pouya', '2023-11-10 15:35:44'),
-(50, 1, 30, 'pourquoi ?', '2023-11-10 15:55:32');
+(50, 1, 30, 'pourquoi ?', '2023-11-10 15:55:32'),
+(51, 1, 30, 'Salut la compagnie !', '2023-11-11 12:18:29'),
+(52, 1, 30, 'ça remarche bebz', '2023-11-11 12:18:38'),
+(53, 1, 30, 'j\'update le time', '2023-11-12 14:49:45'),
+(54, 1, 30, 'non ?', '2023-11-12 14:50:54'),
+(55, 1, 30, 'là oui normalement', '2023-11-12 14:51:22'),
+(56, 1, 30, 'et là ?', '2023-11-12 14:52:56'),
+(57, 2, 31, 'ça dit quoi la team ?', '2023-11-12 14:59:28'),
+(58, 1, 30, 'ok', '2023-11-12 16:23:55'),
+(59, 2, 30, 'maj', '2023-11-12 16:59:04'),
+(60, 2, 31, 'j\'ai l\'impression que ça marche pas trop mal', '2023-11-12 17:00:06'),
+(61, 2, 31, 'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo', '2023-11-12 17:00:21'),
+(62, 2, 30, 'C\'est assez intéressant comme proposition Miranda. Je te propose qu\'on se cale une visio dans la semaine pour en parler plus en profondeur. Tu serais disponible mardi soir ? J\'attends de tes nouvelles ! Biz Michel', '2023-11-12 17:07:39'),
+(63, 2, 31, 'On se cale ça mardi ouais !', '2023-11-12 18:12:10'),
+(64, 2, 31, 'bonjour', '2023-11-12 18:48:37'),
+(65, 1, 30, 'bonjour', '2023-11-12 18:48:49'),
+(66, 2, 31, 'oh', '2023-11-12 19:14:13'),
+(67, 2, 31, 'oh', '2023-11-12 19:14:20');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `users`
+-- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role` tinytext NOT NULL DEFAULT 'user',
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `role` varchar(20) NOT NULL DEFAULT 'user',
   `first_name` varchar(130) DEFAULT NULL,
   `last_name` varchar(130) DEFAULT NULL,
   `mail` varchar(180) DEFAULT NULL,
-  `date_created` datetime NOT NULL DEFAULT current_timestamp(),
-  `date_updated` datetime DEFAULT current_timestamp(),
-  `last_visit` datetime NOT NULL DEFAULT current_timestamp(),
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` datetime DEFAULT CURRENT_TIMESTAMP,
+  `last_visit` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `password` varchar(200) NOT NULL,
-  `id_image` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
+  `id_image` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Déchargement des données de la table `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `role`, `first_name`, `last_name`, `mail`, `date_created`, `date_updated`, `last_visit`, `password`, `id_image`) VALUES
@@ -270,7 +275,100 @@ INSERT INTO `users` (`id`, `role`, `first_name`, `last_name`, `mail`, `date_crea
 (32, 'editor', 'Paul', 'Tourniquet', 'ptourniquet@gmail.com', '2023-11-02 15:12:57', '2023-11-03 13:59:19', '2023-11-02 15:12:57', '$2y$10$xO7SWXAufcXz3pg3rHcv2.1qmYm.C8klQfxXBV2SeZrZc7NRdxrz2', NULL),
 (35, 'user', 'Fred', 'Coucou', 'f.coucou@gmail.com', '2023-11-03 13:12:09', '2023-11-03 13:31:04', '2023-11-03 13:12:09', '$2y$10$Zi18Wd8ZSbuZLU.WvpYBte5DIHLnlUN3nyTxWlgsrt14exmscZy8O', NULL),
 (36, 'user', 'Patrick', 'Planche', 'patrickplanche@orange.fr', '2023-11-08 09:36:21', '2023-11-08 09:36:21', '2023-11-08 09:36:21', '$2y$10$cFGndsmGFFCt25zWqmMR3.x7x3.ACKEXg.6enBYmd9yVS6.WAj1jC', NULL),
-(37, 'editor', 'Martin', 'Matin', 'martinmatin@gmail.com', '2023-11-08 10:08:21', '2023-11-08 13:22:01', '2023-11-08 10:08:21', '$2y$10$At6ilypBQfuPUoyhq02eb.FSrZ4wCEIBlhZnUAxqpQPfkUj.GBJ5m', 26);
+(37, 'admin', 'Martin', 'Matin', 'martinmatin@gmail.com', '2023-11-08 10:08:21', '2023-11-11 11:20:18', '2023-11-08 10:08:21', '$2y$10$At6ilypBQfuPUoyhq02eb.FSrZ4wCEIBlhZnUAxqpQPfkUj.GBJ5m', 26);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_commentsidimage_imagesid` (`id_image`);
+
+--
+-- Indexes for table `conversations`
+--
+ALTER TABLE `conversations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `conversations_users`
+--
+ALTER TABLE `conversations_users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `images`
+--
+ALTER TABLE `images`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `likes`
+--
+ALTER TABLE `likes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `conversations`
+--
+ALTER TABLE `conversations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `conversations_users`
+--
+ALTER TABLE `conversations_users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `images`
+--
+ALTER TABLE `images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT for table `likes`
+--
+ALTER TABLE `likes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

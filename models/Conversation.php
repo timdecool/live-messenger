@@ -7,7 +7,10 @@ class Conversation {
         $conv = [];
 
         $pdo = connectDB();
-        $statement = $pdo->prepare("SELECT * FROM conversations_users WHERE id_user=? ORDER BY last_seen DESC");
+        $statement = $pdo->prepare("SELECT * FROM conversations_users 
+        INNER JOIN conversations ON conversations.id = conversations_users.id_conv 
+        WHERE conversations_users.id_user=? 
+        ORDER BY conversations.date_updated DESC");
         $statement->execute([$id]);
         $conv = $statement->fetchAll(PDO::FETCH_ASSOC);
         return $conv;

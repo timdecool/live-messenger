@@ -4,7 +4,11 @@
         <h3 id="user-name"></h3>
         <iconify-icon icon="fa-solid:cog" class="intro-icon"></iconify-icon>
     </div>
-    <div id="all-convs">
+    <div>
+        <div id="new-conv"></div>
+
+        <div id="all-convs">
+        </div>
     </div>
     
 </aside>
@@ -25,6 +29,7 @@
     // General variables
     let userId = <?= $_SESSION['user_info']['id'] ?>;
     let curConv = 0;
+    let displayInterval = 0;
     
     // Display conversation
 
@@ -35,6 +40,8 @@
             .then(response => response.json())
             .then(data => curConv = data)
             .catch(error => console.error("Error :", error));
+
+            let displayInterval = setInterval(displayConv, 100);
         })();
 
         // DOM var
@@ -108,7 +115,6 @@
                 window.scrollTo(0, document.body.scrollHeight);
             }
         };
-        let displayInterval = setInterval(displayConv, 100);
 
     // End Display conv
 
@@ -172,12 +178,11 @@
             .then(data => allConvs = data)
             .catch(error => console.error("Error :", error));
 
+            // Création des blocs de résumé des conversations
             while(allConvs.length > convPanel.children.length) {
-                curConv = convPanel.children.length;
                 // Créer le bloc
                 const convBlock = document.createElement('div');
                 convBlock.classList.add('conv-block');
-                convBlock.setAttribute('data-conv-id', allConvs[curConv].id)
                 convPanel.appendChild(convBlock);
                 convBlock.addEventListener('click', changeConv);
 
@@ -189,7 +194,6 @@
                 // Ajouter l'image de la conv
                 const convImg = document.createElement('img');
                 convImg.classList.add('conv-img');
-                convImg.src = allConvs[curConv].src.src;
                 mainSection.appendChild(convImg);
 
                 // Ajout div texte
@@ -197,22 +201,12 @@
                 mainSection.appendChild(convInfos);
                 convInfos.classList.add('.conv-infos');
 
-                // Ajouter les participants à la conv
                 const convUsers = document.createElement('p');
-                let friends = ``;
-                for(user of allConvs[curConv].users) {
-                    if(user.id != userId) {
-                        friends += friends.length == 0 ? '':', ';
-                        friends += `${user.first_name} ${user.last_name}`;
-                    }
-                }
-                convUsers.textContent = `${friends.length > 50 ? friends.substring(0,30)+'...':friends}`;
                 convUsers.classList.add('conv-users');
                 convInfos.appendChild(convUsers);
 
                 // Ajouter le dernier message envoyé à la conv
                 const convMessage = document.createElement('p');
-                convMessage.textContent = `${allConvs[curConv].lastMessage.message.length > 50 ? allConvs[curConv].lastMessage.message.substring(0,30)+"...":allConvs[curConv].lastMessage.message}`;
                 convMessage.classList.add('conv-message');
                 convInfos.appendChild(convMessage);
 
@@ -223,32 +217,62 @@
 
                 const uptodateSign = document.createElement('div');
                 uptodateSign.classList.add('new-messages');
-                timeInfos.appendChild(uptodateSign);
-                uptodateSign.textContent = "";
+                timeInfos.appendChild(uptodateSign);          
 
                 const convTime = document.createElement('p');
-                date = allConvs[curConv].lastMessage.date_sent.split(' ');
+                timeInfos.appendChild(convTime);
+            }
+
+            // Remplissage des blocs
+            for(let i=0; i < convPanel.children.length; i++) {
+                let curBlock = convPanel.children[i];
+                // id de la conv
+                curBlock.setAttribute('data-conv-id', allConvs[i].id);
+                // img de la conv
+                curBlock.children[0].children[0].src = allConvs[i].src.src;
+                // participants à la conv
+                let friends = ``;
+                for(user of allConvs[i].users) {
+                    if(user.id != userId) {
+                        friends += friends.length == 0 ? '':', ';
+                        friends += `${user.first_name} ${user.last_name}`;
+                    }
+                }
+                curBlock.children[0].children[1].children[0].textContent = `${friends.length > 25 ? friends.substring(0,25)+'...':friends}`;
+                // dernier message envoyé
+                curBlock.children[0].children[1].children[1].textContent = `${allConvs[i].lastMessage.message.length > 20 ? allConvs[i].lastMessage.message.substring(0,20)+"...":allConvs[i].lastMessage.message}`;
+                // conv à jour ?
+                if(allConvs[i].upToDate) {
+                    curBlock.children[1].children[0].classList.add('d-none');
+                } else {
+                    curBlock.children[1].children[0].classList.remove('d-none');
+                }
+                // heure du dernier message
+                date = allConvs[i].lastMessage.date_sent.split(' ');
                 date = date[1].split(':');
                 date = `${date[0]}:${date[1]}`;
-                convTime.textContent = date;
-                timeInfos.appendChild(convTime);
+                curBlock.children[1].children[1].textContent = date;            
             }
 
         };
         getAllConvs();
-        setInterval(getAllConvs, 5000);
+        setInterval(getAllConvs, 1000);
 
     // End display all convs
 
+
     function changeConv(e) {
+        clearInterval(displayInterval);
         curConv = e.currentTarget.dataset.convId;
         convTitle.textContent = e.currentTarget.children[0].children[1].children[0].textContent;
+        removeBlock();
+    }
+
+    async function removeBlock() {
+        await displayConv();
         while(convBlock.firstChild) {
             convBlock.removeChild(convBlock.firstChild);
-        }
-
-        displayConv();
+        }        
+        displayInterval = setInterval(displayConv, 500);
     }
-    
-
 </script>
