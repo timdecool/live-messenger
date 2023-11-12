@@ -22,9 +22,11 @@
 </section>
 
 <script>
+    // General variables
+    let userId = <?= $_SESSION['user_info']['id'] ?>;
+    let curConv = 0;
     
     // Display conversation
-        let curConv = 0;
 
         // Get last conv
         (async function getLastConv() {
@@ -40,7 +42,6 @@
         let convBlock = document.querySelector('#conv-content');
         let messageInput = document.querySelector('#message');
         let sendBtn = document.querySelector('#sendBtn');
-        let userId = <?= $_SESSION['user_info']['id'] ?>;
         const months = ['jan','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
         let conversation = [];
 
@@ -60,8 +61,8 @@
                         friends += `${user.first_name} ${user.last_name}`;
                     }
                 }
-                convTitle.textContent = `${friends}`; 
-            }        
+                convTitle.textContent = `${friends}`;
+            }
             
             // Construire la page
             while (conversation.messages.length > convBlock.children.length) {
@@ -107,17 +108,17 @@
                 window.scrollTo(0, document.body.scrollHeight);
             }
         };
-        setInterval(displayConv, 500);
+        let displayInterval = setInterval(displayConv, 100);
 
     // End Display conv
- 
+
     // Post message
         async function postMessage(e) {
             e.preventDefault();
             if(messageInput.value.trim() != "") {
                 let message = {
                     'id_sender': `${userId}`,
-                    'id_conv': `<?= $_GET['conv'] ?>`,
+                    'id_conv': `${curConv}`,
                     'message': messageInput.value
                 }          
                 
@@ -176,7 +177,7 @@
                 // Créer le bloc
                 const convBlock = document.createElement('div');
                 convBlock.classList.add('conv-block');
-                convBlock.setAttribute('data-conv-id', allConvs[curConv][0])
+                convBlock.setAttribute('data-conv-id', allConvs[curConv].id)
                 convPanel.appendChild(convBlock);
                 convBlock.addEventListener('click', changeConv);
 
@@ -188,7 +189,7 @@
                 // Ajouter l'image de la conv
                 const convImg = document.createElement('img');
                 convImg.classList.add('conv-img');
-                convImg.src = allConvs[curConv][3].src;
+                convImg.src = allConvs[curConv].src.src;
                 mainSection.appendChild(convImg);
 
                 // Ajout div texte
@@ -199,7 +200,7 @@
                 // Ajouter les participants à la conv
                 const convUsers = document.createElement('p');
                 let friends = ``;
-                for(user of allConvs[curConv][1]) {
+                for(user of allConvs[curConv].users) {
                     if(user.id != userId) {
                         friends += friends.length == 0 ? '':', ';
                         friends += `${user.first_name} ${user.last_name}`;
@@ -211,17 +212,26 @@
 
                 // Ajouter le dernier message envoyé à la conv
                 const convMessage = document.createElement('p');
-                convMessage.textContent = `${allConvs[curConv][2].message.length > 50 ? allConvs[curConv][2].message.substring(0,30)+"...":allConvs[curConv][2].message}`;
+                convMessage.textContent = `${allConvs[curConv].lastMessage.message.length > 50 ? allConvs[curConv].lastMessage.message.substring(0,30)+"...":allConvs[curConv].lastMessage.message}`;
                 convMessage.classList.add('conv-message');
                 convInfos.appendChild(convMessage);
 
                 // Ajouter l'heure du dernier message
+                const timeInfos = document.createElement('div');
+                convBlock.appendChild(timeInfos);
+                timeInfos.classList.add('time-infos');
+
+                const uptodateSign = document.createElement('div');
+                uptodateSign.classList.add('new-messages');
+                timeInfos.appendChild(uptodateSign);
+                uptodateSign.textContent = "";
+
                 const convTime = document.createElement('p');
-                date = allConvs[curConv][2].date_sent.split(' ');
+                date = allConvs[curConv].lastMessage.date_sent.split(' ');
                 date = date[1].split(':');
                 date = `${date[0]}:${date[1]}`;
                 convTime.textContent = date;
-                convBlock.appendChild(convTime);
+                timeInfos.appendChild(convTime);
             }
 
         };
@@ -230,10 +240,14 @@
 
     // End display all convs
 
-    async function changeConv(e) {
+    function changeConv(e) {
         curConv = e.currentTarget.dataset.convId;
-        
-        console.log(curConv);
+        convTitle.textContent = e.currentTarget.children[0].children[1].children[0].textContent;
+        while(convBlock.firstChild) {
+            convBlock.removeChild(convBlock.firstChild);
+        }
+
+        displayConv();
     }
     
 

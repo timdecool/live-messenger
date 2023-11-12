@@ -14,6 +14,16 @@ $convInfos = [];
 foreach($userConvs as $c) {
     $convUsers = Conversation::getConvUsers($c['id_conv']);
     $lastMessage = Message::getLastMessage($c['id_conv']);
+    $lastUpdate = Conversation::getUpdateTime($c['id_conv']);
+
+    $upToDate = true;
+    $lastSeen = new Datetime($c['last_seen']);
+    $lastUpdate = new Datetime($lastUpdate);
+
+    if($lastSeen < $lastUpdate) {
+        $upToDate = false;
+    }
+    
     $users = [];
     $src = [];
 
@@ -27,13 +37,13 @@ foreach($userConvs as $c) {
             $users[] = User::getUser($u['id_user']);
         }
     }
-    // Et on chope le dernier message envoyé
 
     $conv = [];
-    $conv[] = $c['id_conv'];
-    $conv[] = $users;
-    $conv[] = $lastMessage;
-    $conv[] = $src;
+    $conv['id'] = $c['id_conv'];
+    $conv['users'] = $users;
+    $conv['lastMessage'] = $lastMessage;
+    $conv['src'] = $src;
+    $conv['upToDate'] = $upToDate;
     $convInfos[] = $conv;        
 }
 

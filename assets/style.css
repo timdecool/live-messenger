@@ -34,7 +34,7 @@ body {
 
 #user-photo {
     height: 60px;
-    width: auto;
+    width: 60px;
     border-radius: 50%;
 }
 
@@ -96,6 +96,19 @@ body {
     height: 40px;
     width: 40px;
     border-radius: 50%;
+}
+
+.time-infos {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.new-messages {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background-color: var(--secondary);
 }
 
 

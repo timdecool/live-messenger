@@ -41,4 +41,25 @@ class Conversation {
 
         return $curConv;
     }
+
+    public static function setUpdateTime($id_conv) {
+        $pdo = connectDB();
+        $sql = $pdo->prepare("UPDATE conversations
+        SET date_updated=?
+        WHERE  id=?");
+        $sql->execute([date('Y-m-d H:i:s'),$id_conv]);
+    }
+
+    public static function getUpdateTime($id_conv) {
+        $dateUpdated = "";
+
+        $pdo = connectDB();
+        $statement = $pdo->prepare("SELECT date_updated FROM conversations WHERE id=?");
+        $statement->execute([$id_conv]);
+        $dateUpdated = $statement->fetchColumn();
+
+        return $dateUpdated;
+    }
+
+    
 }
