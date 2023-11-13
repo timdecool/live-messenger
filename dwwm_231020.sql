@@ -6,6 +6,8 @@
 -- Generation Time: Nov 12, 2023 at 07:47 PM
 -- Server version: 5.7.24
 -- PHP Version: 7.4.1
+DROP DATABASE dwwm_231020;
+CREATE DATABASE dwwm_231020;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;

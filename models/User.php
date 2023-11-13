@@ -62,5 +62,14 @@ class User {
         $stmt = $pdo->prepare("DELETE FROM users WHERE id=?");
         $stmt->execute([$id]);
     }
+
+    public static function getUsersByQuery($input) {
+        $users = [];
+        $pdo = connectDB();
+        $sql = $pdo->prepare("SELECT id,first_name,last_name FROM users WHERE first_name LIKE ? OR last_name LIKE ? ORDER BY id DESC LIMIT 5");
+        $sql->execute([$input.'%', $input.'%']);
+        $users = $sql->fetchAll(PDO::FETCH_ASSOC);
+        return $users;
+    }
     
 }

@@ -10,7 +10,10 @@ $convUsers = Conversation::getConvUsers($_GET['conv']);
 $users = [];
 
 foreach($convUsers as $u) {
-    $users[] = User::getUser($u['id_user']);
+    $user = [];
+    $user['userId'] = User::getUser($u['id_user']);
+    $user['userActivity'] = Conversation::getActivity($_GET['conv'],$u['id_user']);
+    $users[] = $user;
 }
 
 $conversation = array("users" => $users, "messages" => $messages);

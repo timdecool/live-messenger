@@ -1,5 +1,4 @@
 <?php
-
 require_once "./services/database.php";
 
 class Conversation {
@@ -62,6 +61,26 @@ class Conversation {
         $dateUpdated = $statement->fetchColumn();
 
         return $dateUpdated;
+    }
+
+    public static function updateIsTyping($isTyping, $id_conv, $id_user) {
+        $pdo = connectDB();
+        $sql = $pdo->prepare("UPDATE conversations_users
+        SET isTyping=?
+        WHERE  id_conv=? AND id_user=?");
+        $sql->execute([$isTyping,$id_conv,$id_user]);
+    }
+
+    public static function getActivity($id_conv, $id_user) {
+        $activity = [];
+
+        $pdo = connectDB();
+        $statement = $pdo->prepare("SELECT * FROM conversations_users WHERE id_conv=? AND id_user=?");
+        $statement->execute([$id_conv,$id_user]);
+        $activity = $statement->fetchColumn();
+
+        return $activity;
+
     }
 
     

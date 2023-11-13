@@ -5,7 +5,11 @@
         <iconify-icon icon="fa-solid:cog" class="intro-icon"></iconify-icon>
     </div>
     <div>
-        <div id="new-conv"></div>
+        <div id="new-conv">
+            <input type="text" id="user-search">
+            <div id="users-found"></div>
+            <button class="btn">+</button>
+        </div>
 
         <div id="all-convs">
         </div>
@@ -65,7 +69,7 @@
                 for(user of conversation.users) {
                     if(user.id != userId) {
                         friends += friends.length == 0 ? '':', ';
-                        friends += `${user.first_name} ${user.last_name}`;
+                        friends += `${user.userId.first_name} ${user.userId.last_name}`;
                     }
                 }
                 convTitle.textContent = `${friends}`;
@@ -82,15 +86,15 @@
                 // Préparer le nom de l'utilisateur qui écrit le message
                 let name = ``;
                 for(user of conversation.users) {
-                    if(currentMessage.id_sender == user.id) {
-                        name = user.first_name;
+                    if(currentMessage.id_sender == user.userId.id) {
+                        name = user.userId.first_name;
                     }
                 }
                 // Create user name
-                const cardName = document.createElement('p');
-                cardName.classList.add('card-name');
-                cardName.textContent = `${userId == currentMessage.id_sender ? "":name}`;
-                cardGroup.appendChild(cardName)
+                    const cardName = document.createElement('p');
+                    cardName.classList.add('card-name');
+                    cardName.textContent = `${name}`;
+                    cardGroup.appendChild(cardName)
                 
                 // Create card body
                 const cardBody = document.createElement('div');
@@ -260,7 +264,6 @@
 
     // End display all convs
 
-
     function changeConv(e) {
         clearInterval(displayInterval);
         curConv = e.currentTarget.dataset.convId;
@@ -275,4 +278,28 @@
         }        
         displayInterval = setInterval(displayConv, 500);
     }
+
+    let searchedUsers = [];
+    let searchInput = document.querySelector('#user-search');
+    let usersFound = document.querySelector('#users-found');
+    // Create conv
+    async function searchUser() {
+        let query = searchInput.value;
+        await fetch(`?page=searchusers&q=${query}`)
+        .then(response => response.json())
+        .then(data => searchedUsers = data)
+        .catch(error => console.error("Error :", error));
+        
+        while(usersFound.firstChild) {
+            usersFound.removeChild(usersFound.firstChild);
+        }
+        for(user of searchedUsers.users) {
+            const userP = document.createElement('p');
+            userP.textContent = `${user.first_name} ${user.last_name}`;
+            usersFound.appendChild(userP);
+        }
+    }
+    searchInput.addEventListener('keyup',searchUser);
+
+
 </script>
